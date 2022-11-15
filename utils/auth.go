@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
@@ -34,15 +35,22 @@ func GenerateToken(data any, tokenExpireTimeHours int, encryptionKey string, isR
 // IsTokenValid check if the passed token is valid
 // token is a string type and represents the token assigned to the user
 // encryptionKey is a string type, represents a secret value to encrypt the token
-func IsTokenValid(token string, encryptionKey string) error {
-	_, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+func IsTokenValid(token string, encryptionKey string) (data any, err error) {
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(encryptionKey), nil
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	// Check if the parsed token is ok and gets the payload
+	payload, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !(ok && parsedToken.Valid) {
+		return nil, errors.New("invalid token")
+	}
+
+	return payload, nil
 }
