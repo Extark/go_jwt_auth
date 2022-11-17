@@ -52,5 +52,5 @@ func IsTokenValid(token string, encryptionKey string) (data any, err error) {
 		return nil, errors.New("invalid token")
 	}
 
-	return payload, nil
+	return payload["data"], nil
 }

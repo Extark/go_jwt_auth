@@ -19,3 +19,9 @@ func CreateTokens(data any, tokenExpireTimeHours int, encryptionKey string) (acc
 
 	return access, refresh, err
 }
+
+// GetTokenData this method gets the value of the data inside the JWT token and gets a response only if the token is valid
+func GetTokenData(token string, encryptionKey string) (data any, err error) {
+	//Check if is valid and in this case it returns the data string
+	return utils.IsTokenValid(token, encryptionKey)
+}
