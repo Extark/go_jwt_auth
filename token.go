@@ -1,17 +1,19 @@
-package utils
+package go_jwt_auth
 
 import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"net/http"
+	"strings"
 	"time"
 )
 
-// GenerateToken creates a new token and save inside it all the data you need (es. uuid of the user)
+// generateToken creates a new token and save inside it all the data you need (es. uuid of the user)
 // data is an any type, and represents the data to save inside the token
 // tokenExpireTimeHours is a int type, represents the duration in hours of the token
 // encryptionKey is a string type, represents a secret value to encrypt the token
-func GenerateToken(data any, tokenExpireTimeHours int, encryptionKey string, isRefreshToken bool) (string, error) {
+func generateToken(data any, tokenExpireTimeHours int, encryptionKey string, isRefreshToken bool) (string, error) {
 	//Generate claim struct and populate it
 	claims := jwt.MapClaims{}
 
@@ -32,10 +34,10 @@ func GenerateToken(data any, tokenExpireTimeHours int, encryptionKey string, isR
 	return token.SignedString([]byte(encryptionKey))
 }
 
-// IsTokenValid check if the passed token is valid
+// isTokenValid check if the passed token is valid
 // token is a string type and represents the token assigned to the user
 // encryptionKey is a string type, represents a secret value to encrypt the token
-func IsTokenValid(token string, encryptionKey string) (data any, err error) {
+func isTokenValid(token string, encryptionKey string) (data any, err error) {
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -53,4 +55,14 @@ func IsTokenValid(token string, encryptionKey string) (data any, err error) {
 	}
 
 	return payload["data"], nil
+}
+
+// extractToken extracts the token from the header
+func extractToken(r *http.Request) (token string) {
+	bearerToken := r.Header.Get("Authorization")
+	if len(strings.Split(bearerToken, " ")) == 2 {
+		return strings.Split(bearerToken, " ")[1]
+	}
+
+	return ""
 }
