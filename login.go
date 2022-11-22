@@ -26,7 +26,7 @@ func GetTokenData(token string, encryptionKey string) (data any, err error) {
 	return isTokenValid(token, encryptionKey)
 }
 
-// ExtractAndGetTokenData s
+// ExtractAndGetTokenData this method gets the value of the data inside the JWT token and gets a response only if the token is valid
 func ExtractAndGetTokenData(r *http.Request, encryptionKey string) (data any, err error) {
 	token := extractToken(r)
 	return isTokenValid(token, encryptionKey)
