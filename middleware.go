@@ -33,7 +33,8 @@ func JwtAuthMiddleware(next http.HandlerFunc, encryptionKey string) http.Handler
 	}
 }
 
-func JwtCasbinAuthMiddleware(next http.HandlerFunc, adapter *gormadapter.Adapter, encryptionKey string) http.HandlerFunc {
+// JwtCasbinAuthMiddleware makes the same of the JwtAuthMiddleware, buts ad the permissions with casbin on the routes
+func JwtCasbinAuthMiddleware(next http.Handler, adapter *gormadapter.Adapter, encryptionKey string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//set the header content type
 		w.Header().Set("Content-Type", "application/json")
